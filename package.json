@@ -3,6 +3,11 @@
   "displayName": "JsonTool",
   "description": "json tool support human-reading formating, jsonl formating, minifying",
   "version": "0.0.1",
+  "publisher": "the-phuong",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phuong7410/jsontool.git"
+  },
   "engines": {
     "vscode": "^1.118.0"
   },

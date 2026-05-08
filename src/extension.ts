@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Helper: Handles the VS Code Editor Interaction
     const runCommand = (mode: 'format' | 'minify') => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor) return;
+        if (!editor) { return; }
 
         const document = editor.document;
         const selection = editor.selection;
@@ -64,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 3. TO JSONL COMMAND (Keep this separate as it specifically expects Arrays)
     const toJsonl = vscode.commands.registerCommand('jsontool.toJsonl', () => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor) return;
+        if (!editor) { return; }
         
         const doc = editor.document;
         const text = doc.getText().trim();
