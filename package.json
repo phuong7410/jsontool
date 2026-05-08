@@ -14,10 +14,37 @@
   "contributes": {
     "commands": [
       {
-        "command": "jsontool.helloWorld",
-        "title": "Hello World"
+        "command": "jsontool.format",
+        "title": "JSON: Format (Pretty)"
+      },
+      {
+        "command": "jsontool.minify",
+        "title": "JSON: Minify"
+      },
+      {
+        "command": "jsontool.toJsonl",
+        "title": "JSON: Convert to JSONL"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "jsontool.format",
+          "when": "editorLangId == json",
+          "group": "navigation"
+        },
+        {
+          "command": "jsontool.minify",
+          "when": "editorLangId == json",
+          "group": "navigation"
+        },
+        {
+          "command": "jsontool.toJsonl",
+          "when": "editorLangId == json",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
