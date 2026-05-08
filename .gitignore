@@ -4,7 +4,7 @@ dist
 *.tsbuildinfo
 
 # Dependencies
-node_modules
+node_modules/
 
 # VS Code / Testing
 .vscode-test/
