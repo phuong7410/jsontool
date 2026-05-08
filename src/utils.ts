@@ -74,10 +74,6 @@ export function processText(text: string, mode: Mode, indent: number = 4): strin
                 catch { allValidLines = false; break; }
             }
             if (allValidLines && parsedLines.length > 0) {
-                // Compact JSONL (each line equals its own JSON.stringify output) — nothing to convert
-                const isCompact = parsedLines.every((p, i) => JSON.stringify(p) === lines[i].trim());
-                if (isCompact) { throw new Error("Input is already JSONL"); }
-                // Non-compact JSONL (pretty or messy) — normalize
                 return parsedLines.map(toJsonlLine).join('\n');
             }
 
@@ -92,7 +88,14 @@ export function processText(text: string, mode: Mode, indent: number = 4): strin
                 return mode === 'format' ? JSON.stringify(parsed, null, indent) : JSON.stringify(parsed);
             }).join(mode === 'format' ? '\n\n' : '\n');
         } catch {
-            throw new Error("Invalid JSON/JSONL");
+            // Fallback: multi-line JSONL blocks (e.g. formatted JSONL separated by blank lines)
+            try {
+                return extractJsonBlocks(trimmed)
+                    .map(b => mode === 'format' ? JSON.stringify(b, null, indent) : JSON.stringify(b))
+                    .join(mode === 'format' ? '\n\n' : '\n');
+            } catch {
+                throw new Error("Invalid JSON/JSONL");
+            }
         }
     }
 }

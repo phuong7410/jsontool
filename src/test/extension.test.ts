@@ -73,6 +73,33 @@ suite('processText – minify', () => {
         assert.strictEqual(processText(input, 'minify', 2), expected);
     });
 
+    test('minifies a formatted JSONL (each object separated by blank line)', () => {
+        const input = `{
+  "a": 1
+}
+
+{
+  "b": 2
+}`;
+        const expected = '{"a":1}\n{"b":2}';
+        assert.strictEqual(processText(input, 'minify', 2), expected);
+    });
+
+    test('minifies a formatted JSONL (each object separated by blank line) with messing newline and spaces', () => {
+        const input = `{
+  "a": 1 
+} 
+
+{
+  "b" : 2
+}
+{
+  "c": 3
+} `;
+        const expected = '{"a":1}\n{"b":2}\n{"c":3}';
+        assert.strictEqual(processText(input, 'minify', 2), expected);
+    });
+
     test('throws on invalid input', () => {
         assert.throws(() => processText('not json', 'minify', 2));
     });
@@ -140,8 +167,10 @@ suite('processText – toJsonl', () => {
         assert.strictEqual(processText(input, 'toJsonl', 2), expected);
     });
 
-    test('throws when input is already JSONL (no fallback)', () => {
-        assert.throws(() => processText('{"a":1}\n{"b":2}', 'toJsonl', 2));
+    test('converts compact JSONL to standard JSONL', () => {
+        const input    = '{"a":1}\n{"b":2}';
+        const expected = '{"a": 1}\n{"b": 2}';
+        assert.strictEqual(processText(input, 'toJsonl', 2), expected);
     });
 
     test('throws on invalid input', () => {
