@@ -86,12 +86,18 @@ suite('processText – toJsonl', () => {
         assert.strictEqual(processText(input, 'toJsonl', 2), expected);
     });
 
+    test('converts a JSON array to JSONL with spaces', () => {
+        const input    = '[{"a":1},{"b": 2, "c": 3}]';
+        const expected = '{"a": 1}\n{"b": 2, "c": 3}';
+        assert.strictEqual(processText(input, 'toJsonl', 2), expected);
+    });
+
     test('converts a JSON object to JSONL', () => {
         const input    = `{
   "a": 1,
   "b": 2
 }`;
-        const expected = '{"a": 1,"b": 2}';
+        const expected = '{"a": 1, "b": 2}';
         assert.strictEqual(processText(input, 'toJsonl', 2), expected);
     });
 
@@ -119,6 +125,18 @@ suite('processText – toJsonl', () => {
   "c": 3
 }`;
         const expected = '{"a": 1}\n{"b": 2}\n{"c": 3}';
+        assert.strictEqual(processText(input, 'toJsonl', 2), expected);
+    });
+
+    test('converts an already JSONL to JSONL, no touch', () => {
+        const input    = '{"a": 1}\n{"b": 2}\n{"c": 3, "d": "sa"}';
+        const expected = input;
+        assert.strictEqual(processText(input, 'toJsonl', 2), expected);
+    });
+
+    test('converts an already JSONL with messing spaces to standard JSONL', () => {
+        const input    = ' {"a" :1}\n{ "b": 2}\n {"c": 3 ,"d":"sa" } ';
+        const expected = '{"a": 1}\n{"b": 2}\n{"c": 3, "d": "sa"}';
         assert.strictEqual(processText(input, 'toJsonl', 2), expected);
     });
 

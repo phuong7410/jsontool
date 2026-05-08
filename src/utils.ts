@@ -1,7 +1,24 @@
 export type Mode = 'format' | 'minify' | 'toJsonl';
 
-const toJsonlLine = (item: unknown): string =>
-    JSON.stringify(item).replace(/"([^"]*)":/g, '"$1": ');
+const toJsonlLine = (item: unknown): string => {
+    const s = JSON.stringify(item);
+    let result = '';
+    let inString = false;
+    let escape = false;
+    for (const ch of s) {
+        if (escape) { escape = false; result += ch; continue; }
+        if (inString) {
+            if (ch === '\\') { escape = true; }
+            else if (ch === '"') { inString = false; }
+            result += ch;
+        } else {
+            if (ch === '"') { inString = true; }
+            result += ch;
+            if (ch === ':' || ch === ',') { result += ' '; }
+        }
+    }
+    return result;
+};
 
 function extractJsonBlocks(text: string): unknown[] {
     const blocks: unknown[] = [];
@@ -49,10 +66,20 @@ export function processText(text: string, mode: Mode, indent: number = 4): strin
         return mode === 'format' ? JSON.stringify(json, null, indent) : JSON.stringify(json);
     } catch (e) {
         if (mode === 'toJsonl') {
-            // If every non-empty line is already valid JSON, it's already JSONL — don't convert
             const lines = trimmed.split('\n').filter(l => l.trim());
-            const alreadyJsonl = lines.every(l => { try { JSON.parse(l); return true; } catch { return false; } });
-            if (alreadyJsonl) { throw new Error("Input is already JSONL"); }
+            const parsedLines: unknown[] = [];
+            let allValidLines = true;
+            for (const l of lines) {
+                try { parsedLines.push(JSON.parse(l)); }
+                catch { allValidLines = false; break; }
+            }
+            if (allValidLines && parsedLines.length > 0) {
+                // Compact JSONL (each line equals its own JSON.stringify output) — nothing to convert
+                const isCompact = parsedLines.every((p, i) => JSON.stringify(p) === lines[i].trim());
+                if (isCompact) { throw new Error("Input is already JSONL"); }
+                // Non-compact JSONL (pretty or messy) — normalize
+                return parsedLines.map(toJsonlLine).join('\n');
+            }
 
             // Multi-line JSONL blocks: extract by brace depth
             return extractJsonBlocks(trimmed).map(toJsonlLine).join('\n');

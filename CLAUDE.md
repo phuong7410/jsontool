@@ -10,7 +10,8 @@ npm run package       # type-check + lint + build (production, minified)
 npm run watch         # parallel watch for esbuild + tsc (for active development)
 npm run lint          # ESLint on src/
 npm run check-types   # TypeScript type-check only, no emit
-npm run test          # run extension tests via @vscode/test-cli
+npm run test:unit     # run unit tests (pure logic, no VS Code needed, fast)
+npm run test          # run extension tests via @vscode/test-cli (downloads VS Code)
 ```
 
 To package the extension as a `.vsix` for installation:
@@ -31,4 +32,7 @@ All three commands (`jsontool.format`, `jsontool.minify`, `jsontool.toJsonl`) sh
 
 **Build pipeline:** esbuild bundles `src/extension.ts` → `dist/extension.js` (CommonJS, `vscode` externalized). TypeScript is checked separately via `tsc --noEmit`. The `.vscodeignore` strips everything except `dist/extension.js` from the packaged `.vsix`.
 
-**Testing:** Tests live in `src/test/` and compile to `out/`. The test runner uses `@vscode/test-cli` / `@vscode/test-electron`, which launches a real VS Code instance. Currently the test suite is a skeleton — actual command behavior is untested.
+**Testing:** Tests live in `src/test/` and compile to `out/`. Two test modes:
+
+- **Unit tests** (`npm run test:unit`) — run mocha directly on compiled output. Tests `processText` pure logic only, no VS Code dependency, fast.
+- **Extension tests** (`npm run test`) — launches a real VS Code instance via `@vscode/test-cli` / `@vscode/test-electron`. Use this for testing VS Code command behavior (editor integration, selections, etc.).
